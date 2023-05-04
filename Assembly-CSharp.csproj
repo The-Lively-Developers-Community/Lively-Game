@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{8FC88C1C-2DD0-EEDF-5469-9A4AFFA6E67F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -58,7 +59,6 @@
   <ItemGroup>
     <Compile Include="Assets\Move.cs" />
     <Compile Include="Assets\CapsuleController.cs" />
-    <Compile Include="Assets\KeepUpright.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
