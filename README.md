@@ -11,3 +11,5 @@ To modify the game yourself, please fork it then modify it, then create a PR con
 Until suggestions come, I will make this a Parkour game.
 
 Online mode is expected to come by next year (or next next year).
+
+Thanks! - Nina (realguystuff)
