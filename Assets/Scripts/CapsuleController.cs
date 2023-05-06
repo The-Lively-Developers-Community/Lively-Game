@@ -25,19 +25,8 @@ public class CapsuleController : MonoBehaviour
         cameraTransform = Camera.main.transform;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        // Flatten the camera's forward direction onto the XZ plane
-        cameraForward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
-
-        // Move the capsule using WASD keys
-        float horizontalMovement = Input.GetAxis("Horizontal");
-        float verticalMovement = Input.GetAxis("Vertical");
-
-        Vector3 cameraRight = Vector3.Cross(Vector3.up, cameraTransform.forward).normalized;
-
-        movement = cameraForward * verticalMovement + cameraRight * horizontalMovement;
-        movement = Vector3.ClampMagnitude(movement, 1.0f) * moveSpeed;
 
         // Use cameraForward instead of cameraTransform.forward
         Vector3 jumpDirection = cameraForward + Vector3.up;
@@ -55,11 +44,6 @@ public class CapsuleController : MonoBehaviour
             isGrounded = false;
         }
 
-        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.W))
-        {
-            movement *= sprintSpeed / moveSpeed;
-        }
-
         if (Input.GetKeyDown(KeyCode.R))
         {
             capsuleTransform.position = new Vector3(0, 1.1f, -10);
@@ -68,10 +52,7 @@ public class CapsuleController : MonoBehaviour
         // Apply movement to rigidbody
         movement.y = rb.velocity.y;
         rb.velocity = movement;
-    }
 
-    void Update()
-    {
         if (isGrounded)
         {
             timer -= Time.deltaTime;
@@ -81,6 +62,28 @@ public class CapsuleController : MonoBehaviour
             }
             timerText.text = "Time until stamina fills up: " + timer.ToString("F1");
         }
+        else
+        {
+            if (timer < 0.0f)
+            {
+                timer = 0.0f;
+            }
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        // Flatten the camera's forward direction onto the XZ plane
+        cameraForward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
+
+        // Move the capsule using WASD keys
+        float horizontalMovement = Input.GetAxis("Horizontal");
+        float verticalMovement = Input.GetAxis("Vertical");
+
+        Vector3 cameraRight = Vector3.Cross(Vector3.up, cameraTransform.forward).normalized;
+
+        movement = cameraForward * verticalMovement + cameraRight * horizontalMovement;
+        movement = Vector3.ClampMagnitude(movement, 1.0f) * moveSpeed;
     }
 
     void OnCollisionEnter(Collision collision)
@@ -88,16 +91,35 @@ public class CapsuleController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
-            timer = 2.0f;
+            timer = 0.5f;
             timerText.text = "Time until stamina fills up: " + timer.ToString("F1");
         }
     }
 
     void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        // Check if the collision is happening with a ground object
+    if (collision.gameObject.CompareTag("Ground"))
+    {
+        // Get the contact points between the capsule and the ground
+        ContactPoint[] contacts = collision.contacts;
+
+        // Check if any of the contact points have a normal vector pointing upwards (i.e., from the bottom of the capsule)
+        bool isBottomCollision = false;
+        foreach (ContactPoint contact in contacts)
         {
-            isGrounded = false;
+            if (contact.normal.y > 0.05f)
+            {
+                isBottomCollision = true;
+                break;
+            }
         }
+
+        // If the collision is happening from the bottom, set the timer to 2.0
+        if (isBottomCollision)
+        {
+            timer = 2.0f;
+        }
+    }
     }
 }
