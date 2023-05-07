@@ -5,8 +5,6 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
-  - StaminaTimer
-  - Stopwatch
   layers:
   - Default
   - TransparentFX

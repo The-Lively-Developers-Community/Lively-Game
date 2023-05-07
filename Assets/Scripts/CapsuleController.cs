@@ -1,55 +1,104 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
 public class CapsuleController : MonoBehaviour
 {
-    public float speed = 10f;
-    public float jumpForce = 500f;
-    public float timerMax = 2f;
+    public float moveSpeed = 10.0f;
+    public float sprintSpeed = 20.0f;
+    public float jumpHeight = 5.0f;
     public TextMeshProUGUI timerText;
 
+    private float timer = 0.0f;
+    private Transform capsuleTransform;
     private Rigidbody rb;
     private bool isGrounded = true;
-    private float timer;
+    private Transform cameraTransform;
+    private Vector3 cameraForward;
+    private Vector3 movement;
 
-    private void Start()
+    void Start()
     {
+        capsuleTransform = GetComponent<Transform>();
         rb = GetComponent<Rigidbody>();
-        timer = timerMax;
+        cameraTransform = Camera.main.transform;
     }
 
     private void Update()
     {
-        if (Input.GetButtonDown("Jump") && isGrounded)
+
+        // Use cameraForward instead of cameraTransform.forward
+        Vector3 jumpDirection = cameraForward + Vector3.up;
+
+        // Sprint using Ctrl+W
+        if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.W))
         {
-            rb.AddForce(new Vector3(0f, jumpForce, 0f));
+            movement *= sprintSpeed / moveSpeed;
+        }
+
+        // Jump using the spacebar
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && timer <= 0.0f)
+        {
+            rb.AddForce(jumpDirection * Mathf.Sqrt(jumpHeight * -2.0f * Physics.gravity.y), ForceMode.VelocityChange);
             isGrounded = false;
         }
 
-        if (timer < timerMax)
+        if (Input.GetKeyDown(KeyCode.R))
         {
-            timer += Time.deltaTime;
-            if (timer > timerMax)
-            {
-                timer = timerMax;
-            }
+            capsuleTransform.position = new Vector3(0, 1.1f, -10);
         }
 
-        timerText.text = "Time until stamina fills up: " + Mathf.Round(timer * 100f) / 100f;
+        // Apply movement to rigidbody
+        movement.y = rb.velocity.y;
+        rb.velocity = movement;
+
+        if (isGrounded)
+        {
+            timer -= Time.deltaTime;
+            if (timer < 0.0f)
+            {
+                timer = 0.0f;
+            }
+            timerText.text = "Time until stamina fills up: " + timer.ToString("F1");
+        }
+        else
+        {
+            if (timer < 0.0f)
+            {
+                timer = 0.0f;
+            }
+        }
     }
 
     private void FixedUpdate()
     {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+        // Flatten the camera's forward direction onto the XZ plane
+        cameraForward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
 
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        // Move the capsule using WASD keys
+        float horizontalMovement = Input.GetAxis("Horizontal");
+        float verticalMovement = Input.GetAxis("Vertical");
 
-        rb.AddForce(movement * speed);
+        Vector3 cameraRight = Vector3.Cross(Vector3.up, cameraTransform.forward).normalized;
+
+        movement = cameraForward * verticalMovement + cameraRight * horizontalMovement;
+        movement = Vector3.ClampMagnitude(movement, 1.0f) * moveSpeed;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter(Collision collision)
     {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+            timer = 0.5f;
+            timerText.text = "Time until stamina fills up: " + timer.ToString("F1");
+        }
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        // Check if the collision is happening with a ground object
         if (collision.gameObject.CompareTag("Ground"))
         {
             // Get the contact points between the capsule and the ground
@@ -59,19 +108,18 @@ public class CapsuleController : MonoBehaviour
             bool isBottomCollision = false;
             foreach (ContactPoint contact in contacts)
             {
-                if (contact.normal.y > 0.5f)
+                if (contact.normal.y > 0.05f)
                 {
                     isBottomCollision = true;
                     break;
                 }
             }
 
-            // If the collision is happening from the bottom, set the timer to 0
+            // If the collision is happening from the bottom, set the timer to 2.0
             if (isBottomCollision)
             {
-                timer = 0f;
-                isGrounded = true;
-            } // 
+                timer = 2.0f;
+            }
         }
     }
 }
