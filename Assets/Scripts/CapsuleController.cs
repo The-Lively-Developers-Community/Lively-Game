@@ -9,14 +9,18 @@ public class CapsuleController : MonoBehaviour
     public float sprintSpeed = 20.0f;
     public float jumpHeight = 5.0f;
     public TextMeshProUGUI timerText;
+    public TextMeshProUGUI stopwatchText;
 
     private float timer = 0.0f;
+    private float stopwatch = 0.0f;
+    private bool isGrounded = true;
     private Transform capsuleTransform;
     private Rigidbody rb;
-    private bool isGrounded = true;
     private Transform cameraTransform;
     private Vector3 cameraForward;
     private Vector3 movement;
+    private bool isTimerRunning = false;
+    private bool stopwatchDone = false;
 
     void Start()
     {
@@ -27,9 +31,13 @@ public class CapsuleController : MonoBehaviour
 
     private void Update()
     {
-
         // Use cameraForward instead of cameraTransform.forward
         Vector3 jumpDirection = cameraForward + Vector3.up;
+
+        if ((Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D)) && !isTimerRunning && !stopwatchDone)
+        {
+            isTimerRunning = true;
+        }
 
         // Sprint using Ctrl+W
         if (Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.W))
@@ -38,7 +46,7 @@ public class CapsuleController : MonoBehaviour
         }
 
         // Jump using the spacebar
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && timer <= 0.0f)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && timer < 0.1f)
         {
             rb.AddForce(jumpDirection * Mathf.Sqrt(jumpHeight * -2.0f * Physics.gravity.y), ForceMode.VelocityChange);
             isGrounded = false;
@@ -47,11 +55,20 @@ public class CapsuleController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             capsuleTransform.position = new Vector3(0, 1.1f, -10);
+            stopwatch = 0.0f;
+            stopwatchDone = false;
+            isTimerRunning = false;
         }
 
         // Apply movement to rigidbody
         movement.y = rb.velocity.y;
         rb.velocity = movement;
+
+        if (isTimerRunning)
+        {
+            stopwatch += Time.deltaTime;
+            stopwatchText.text = "Time: " + stopwatch.ToString("F2");
+        }
 
         if (isGrounded)
         {
@@ -61,13 +78,6 @@ public class CapsuleController : MonoBehaviour
                 timer = 0.0f;
             }
             timerText.text = "Time until stamina fills up: " + timer.ToString("F1");
-        }
-        else
-        {
-            if (timer < 0.0f)
-            {
-                timer = 0.0f;
-            }
         }
     }
 
@@ -90,36 +100,19 @@ public class CapsuleController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
+            if (!isTimerRunning)
+            {
+                isTimerRunning = false;
+            }
             isGrounded = true;
             timer = 0.5f;
             timerText.text = "Time until stamina fills up: " + timer.ToString("F1");
         }
-    }
 
-    void OnCollisionExit(Collision collision)
-    {
-        // Check if the collision is happening with a ground object
-        if (collision.gameObject.CompareTag("Ground"))
+        if (collision.gameObject.CompareTag("Finish"))
         {
-            // Get the contact points between the capsule and the ground
-            ContactPoint[] contacts = collision.contacts;
-
-            // Check if any of the contact points have a normal vector pointing upwards (i.e., from the bottom of the capsule)
-            bool isBottomCollision = false;
-            foreach (ContactPoint contact in contacts)
-            {
-                if (contact.normal.y > 0.05f)
-                {
-                    isBottomCollision = true;
-                    break;
-                }
-            }
-
-            // If the collision is happening from the bottom, set the timer to 2.0
-            if (isBottomCollision)
-            {
-                timer = 2.0f;
-            }
+            isTimerRunning = false;
+            stopwatchDone = true;
         }
     }
 }
