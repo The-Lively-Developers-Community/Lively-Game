@@ -59,6 +59,7 @@
     <Compile Include="Assets\Scripts\CapsuleController.cs" />
     <Compile Include="Assets\Scripts\Move.cs" />
     <Compile Include="Assets\Scripts\StartGamePls.cs" />
+    <Compile Include="Assets\Scripts\TimerController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
