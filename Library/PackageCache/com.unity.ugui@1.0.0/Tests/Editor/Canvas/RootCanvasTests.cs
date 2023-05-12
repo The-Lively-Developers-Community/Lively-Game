@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Category("Canvas")]
 public class RootCanvasTests : TestBehaviourBase<UnityEngine.Canvas>
@@ -48,9 +49,33 @@ public class RootCanvasTests : TestBehaviourBase<UnityEngine.Canvas>
     }
 
     [Test]
-    public void IsNotRootCanvasWhenDisabled()
+    public void NotRootCanvasAnchorsDontGetReset()
     {
-        baseCanvas.enabled = false;
-        Assert.IsFalse(baseCanvas.isRootCanvas);
+        var rect = rootCanvasChild.GetComponent<RectTransform>();
+
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+
+        Assert.IsTrue(rect.anchorMin == Vector2.zero);
+        Assert.IsTrue(rect.anchorMax == Vector2.one);
+
+        m_TestObject.gameObject.SetActive(false);
+
+        Assert.IsTrue(rect.anchorMin == Vector2.zero);
+        Assert.IsTrue(rect.anchorMax == Vector2.one);
+    }
+
+    [Test]
+    public void ChildOfDisabledCanvasCantReceiveClicks()
+    {
+        rootCanvasChild.gameObject.AddComponent<Image>();
+        var raycasts = GraphicRegistry.GetRaycastableGraphicsForCanvas(rootCanvasChild);
+
+        Assert.IsTrue(raycasts.Count == 1);
+
+        m_TestObject.gameObject.SetActive(false);
+        raycasts = GraphicRegistry.GetRaycastableGraphicsForCanvas(rootCanvasChild);
+
+        Assert.IsTrue(raycasts.Count == 0);
     }
 }

@@ -31,6 +31,18 @@ public class CapsuleController : MonoBehaviour
 
     private void Update()
     {
+        // Flatten the camera's forward direction onto the XZ plane
+        cameraForward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
+
+        // Move the capsule using WASD keys
+        float horizontalMovement = Input.GetAxis("Horizontal");
+        float verticalMovement = Input.GetAxis("Vertical");
+
+        Vector3 cameraRight = Vector3.Cross(Vector3.up, cameraTransform.forward).normalized;
+
+        movement = cameraForward * verticalMovement + cameraRight * horizontalMovement;
+        movement = Vector3.ClampMagnitude(movement, 1.0f) * moveSpeed;
+
         // Use cameraForward instead of cameraTransform.forward
         Vector3 jumpDirection = cameraForward + Vector3.up;
 
@@ -79,21 +91,6 @@ public class CapsuleController : MonoBehaviour
             }
             timerText.text = "Time until stamina fills up: " + timer.ToString("F1");
         }
-    }
-
-    private void FixedUpdate()
-    {
-        // Flatten the camera's forward direction onto the XZ plane
-        cameraForward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
-
-        // Move the capsule using WASD keys
-        float horizontalMovement = Input.GetAxis("Horizontal");
-        float verticalMovement = Input.GetAxis("Vertical");
-
-        Vector3 cameraRight = Vector3.Cross(Vector3.up, cameraTransform.forward).normalized;
-
-        movement = cameraForward * verticalMovement + cameraRight * horizontalMovement;
-        movement = Vector3.ClampMagnitude(movement, 1.0f) * moveSpeed;
     }
 
     void OnCollisionEnter(Collision collision)

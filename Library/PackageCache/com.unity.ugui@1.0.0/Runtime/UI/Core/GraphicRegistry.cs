@@ -102,7 +102,7 @@ namespace UnityEngine.UI
         /// <param name="graphic">The Graphic to dissociate from the Canvas.</param>
         public static void UnregisterGraphicForCanvas(Canvas c, Graphic graphic)
         {
-            if (c == null)
+            if (c == null || graphic == null)
                 return;
 
             IndexedSet<Graphic> graphics;
@@ -124,7 +124,7 @@ namespace UnityEngine.UI
         /// <param name="graphic">The Graphic to dissociate from the Canvas.</param>
         public static void UnregisterRaycastGraphicForCanvas(Canvas c, Graphic graphic)
         {
-            if (c == null || !graphic.raycastTarget)
+            if (c == null || graphic == null)
                 return;
 
             IndexedSet<Graphic> graphics;

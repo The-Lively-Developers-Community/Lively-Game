@@ -50,6 +50,8 @@ namespace UnityEditor.UI
                 EditorGUILayout.PropertyField(m_Direction);
                 if (EditorGUI.EndChangeCheck())
                 {
+                    Undo.RecordObjects(serializedObject.targetObjects, "Change Slider Direction");
+
                     Slider.Direction direction = (Slider.Direction)m_Direction.enumValueIndex;
                     foreach (var obj in serializedObject.targetObjects)
                     {
@@ -60,7 +62,7 @@ namespace UnityEditor.UI
 
                 EditorGUI.BeginChangeCheck();
                 float newMin = EditorGUILayout.FloatField("Min Value", m_MinValue.floatValue);
-                if(EditorGUI.EndChangeCheck())
+                if (EditorGUI.EndChangeCheck())
                 {
                     if (m_WholeNumbers.boolValue ? Mathf.Round(newMin) < m_MaxValue.floatValue : newMin < m_MaxValue.floatValue)
                         m_MinValue.floatValue = newMin;
