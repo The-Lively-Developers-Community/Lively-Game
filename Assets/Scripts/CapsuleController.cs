@@ -74,7 +74,7 @@ public class CapsuleController : MonoBehaviour
             isTimerRunning = false;
         }
 
-        // Apply movement to rigidbody
+        // Apply movement to rigidbody!
         movement.y = rb.velocity.y;
         rb.velocity = movement;
 
