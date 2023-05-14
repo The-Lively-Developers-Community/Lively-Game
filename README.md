@@ -1,6 +1,6 @@
 # Lively-Game
 
-## Alpha started: 5/9/2023 8:14 AM
+## Alpha started: 5/9/2023 8:14 AM UTC
 
 Alpha started, game making continued by Nina (GitHub: realguystuff)
 
