@@ -59,7 +59,7 @@ public class CapsuleController : MonoBehaviour
             movement *= sprintSpeed / moveSpeed;
         }
 
-        // Jump using the spacebar
+        // Jump using the spacebar!
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && timer < 0.1f)
         {
             rb.AddForce(jumpDirection * Mathf.Sqrt(jumpHeight * -2.0f * Physics.gravity.y), ForceMode.VelocityChange);
