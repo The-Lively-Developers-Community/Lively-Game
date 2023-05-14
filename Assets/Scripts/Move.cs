@@ -8,6 +8,7 @@ public class Move : MonoBehaviour
     private Vector3 initalOffset;
     private Vector3 cameraPosition;
 
+    public bool isPaused = true;
     public float sensitivity = 1f; // set the sensitivity for the camera movement
 
     private float mouseX = 0f; // stores the horizontal mouse movement
@@ -22,7 +23,8 @@ public class Move : MonoBehaviour
 
     void Update()
     {
-        Cursor.lockState = CursorLockMode.Locked; // lock the mouse to the center of the screen
+        if (!isPaused) Cursor.lockState = CursorLockMode.Locked; // lock the mouse to the center of the screen
+        else Cursor.lockState = CursorLockMode.None;
 
         mouseX += Input.GetAxis("Mouse X") * sensitivity; // update the horizontal mouse movement
         mouseY -= Input.GetAxis("Mouse Y") * sensitivity; // update the vertical mouse movement

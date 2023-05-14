@@ -60,6 +60,7 @@
     <Compile Include="Assets\Scripts\TimerController.cs" />
     <Compile Include="Assets\Scripts\Move.cs" />
     <Compile Include="Assets\Scripts\StartGamePls.cs" />
+    <Compile Include="Assets\Scripts\PauseMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

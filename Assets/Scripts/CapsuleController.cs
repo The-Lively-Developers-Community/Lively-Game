@@ -34,6 +34,8 @@ public class CapsuleController : MonoBehaviour
         // Flatten the camera's forward direction onto the XZ plane
         cameraForward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up).normalized;
 
+
+
         // Move the capsule using WASD keys
         float horizontalMovement = Input.GetAxis("Horizontal");
         float verticalMovement = Input.GetAxis("Vertical");
